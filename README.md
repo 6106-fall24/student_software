@@ -10,36 +10,48 @@ The following section will guide you in setting up a local VM for running all co
 
 For Macbooks, we recommend creating and running an Ubuntu machine with [OrbStack](https://orbstack.dev/).
 
-1. Download OrbStack by running the following command.
+1. Download OrbStack by downloading from the site above or by running the following command.
 
    ```
    brew install orbstack
    ```
 
-   You may have to install [brew](https://brew.sh/) if it does not exist on your machine.
-
-2. Create a VM for the class named `6106` as follows:
+2. Turn on Rosetta translation (this will allow your binaries to run much
+   faster if you are on Apple silicon).
 
    ```
-   orb create -a amd64 ubuntu:mantic 6106
+   orb config set rosetta true
    ```
 
-   It is important for much of the course software that your VM is AMD-based as opposed to ARM-based.
+3. Create a Linux VM for the class by opening named `6106` as follows:
 
-3. SSH into your VM by running:
+   ```
+   orb create -a amd64 ubuntu:noble 6106
+   ```
+
+   You can also create VMs through the OrbStack desktop app.
+
+   We require for this class that you run an AMD VM, **not** an ARM VM.
+
+4. SSH into your VM by running:
 
    ```
    ssh orb
    ```
 
-4. Install Git:
+5. Within the Linux terminal, install `git`:
 
    ```
    sudo apt-get update
    sudo apt-get install git
    ```
 
-You should find that the root directory of your macOS is mapped to `/mnt/mac` in the OrbStack VM. Visit this [link](https://docs.orbstack.dev/machines/file-sharing) for more details.
+OrbStack supports file sharing between Linux and macOS, so you may choose to develop entirely within your macOS directories
+if you find it convenient. Visit this [link](https://docs.orbstack.dev/machines/file-sharing) for more details.
+
+You may also set up a remote VSCode connection from your Mac by downloading the
+[Remote - SSH](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh)
+extension and connecting to host `orb`.
 
 ### Windows
 
@@ -48,14 +60,14 @@ For Windows computers, we recommend running an Ubuntu distribution through Windo
 1. Download WSL by running the following command:
 
    ```
-   wsl --install --distribution Ubuntu
+   wsl --install --distribution Ubuntu-24.04
    ```
 
    If you have previously installed WSL, run the following command to update your VM to what we will be using in this class:
 
    ```
    wsl --set-default-version 2
-   wsl --set-default Ubuntu-20.04
+   wsl --set-default Ubuntu-24.04
    ```
 
 2. After installing, create a username and password as prompted.
@@ -70,17 +82,36 @@ The `C:` directory of your Windows machine is mapped to `/mnt/c/`.
 
 ### Linux
 
-If you are working on a Linux machine, most of the course software should be natively compatible.
+If you are working on a Linux machine, most of the course software should be natively compatible. However, the
+setup scripts use the `apt` package manager to install packages, so if you are not using this package manager,
+it would likely be easiest to do this setup in a virtual machine, e.g. setting up a Docker container. Some tools
+used by this class also require a rather recent GLIBC version (2.32). If your GLIBC is not up to date, you should
+also consider using a Docker container. For an example of how to set up a development environment in a Docker
+container, see <https://code.visualstudio.com/docs/devcontainers/containers>.
 
-Do note however that the course infrastructure is designed for Ubuntu 23.10. You may run into less issues, therefore, by developing on a VM with tools such as KVM or VMWare.
+<!-- Do note however that the course infrastructure was designed and tested for a clean install of Ubuntu 23.10.
+You may run into less issues by developing on a VM with tools such as KVM or VMWare. -->
 
 ## Part 2: Configure Your 6.106 VM
 
-Within your Ubuntu machine,
+Within your Linux machine,
 
 ### Configure GitHub credentials
 
-1.  Create an SSH key
+1.  Check if an SSH key exists by running the following command.
+
+    ```
+    ls -al ~/.ssh
+    ```
+
+    If you find that `~/.ssh` does not exist or that no key (`id_ed25519.pub`) exists, continue to step 2.
+    Otherwise, skip to step 3.
+
+    **Note**: For users who already have SSH credentials on their local computers, OrbStack forwards your SSH-Agent to the VM.
+    In this case there is no need to create a new SSH key as it should already exist at `~/.ssh` within the VM.
+    Furthermore, if your local SSH key is already registered on GitHub, there is no need to add it a second time.
+   
+2.  Create an SSH key
 
     ```
     ssh-keygen -t ed25519 -C "your_email@example.com"
@@ -88,15 +119,15 @@ Within your Ubuntu machine,
 
     Press **Enter** to accept the default file location, and enter a passphrase when prompted (or leave it empty).
 
-2.  Copy the pub key
+3.  Copy the pub key from the terminal
 
     ```
-    pbcopy < ~/.ssh/id_ed25519.pub
+    cat ~/.ssh/id_ed25519.pub
     ```
 
-3.  Navigate to `Settings > SSH and GPG keys` on GitHub and click `New SSH Key`. Paste the pub key into the `Key` field and `Add SSH Key`.
+4.  Navigate to `Settings > SSH and GPG keys` on GitHub and click `New SSH Key`. Paste the pub key into the `Key` field and `Add SSH Key`.
 
-4.  Verify your SSH connection
+5.  Verify your SSH connection
 
     ```
     ssh -T git@github.com
@@ -108,14 +139,12 @@ Within your Ubuntu machine,
     Hi <user>! You've successfully authenticated, but GitHub does not provide shell access.
     ```
 
-Note: For users who already have SSH credentials on their local MacBooks, OrbStack forwards your SSH agent to the VM. In this case there is no need to create a new SSH key - it should already exist at the standard directory within the VM. Furthermore, if your local SSH key is already registered on GitHub, there is no need to add it a second time.
-
 ### Install the 6.106 software
 
 1.  Clone this repo:
 
     ```
-    git clone git@github.com:MIT-6-106/student_software.git
+    git clone git@github.com:6106-fall24/student_software.git
     ```
 
 2.  Inside the same terminal, after cloning the repository, run:
@@ -125,27 +154,32 @@ Note: For users who already have SSH credentials on their local MacBooks, OrbSta
     ./install.sh
     ```
 
-3.  (Optional) Configure git to use your favorite editor. For example, to use vim:
+    **Warning:** the installation will take quite a while (around 40 minutes in testing) and may
+    occasionally require you to enter your password.
+
+4.  After running the installation script, you will need to register your telerun credentials - run:
+
+    ```
+    authorize-telerun
+    ```
+
+    Enter your kerb as the username. To obtain your token, visit this [site](https://carlguo.scripts.mit.edu:444/serve_tokens.pl) and authenticate with your MIT certificate. If you don't have an MIT certificate or have not renewed your certificate since last school year, please generate one using [CertAid](https://ist.mit.edu/mit-apps/certaid) and reboot your computer. If the browser prompts you that the site is unsafe, just bypass the safety warning. 
+5.  Configure your git identity:
+
+    ```
+    git config --global user.name "<your name>"
+    git config --global user.email "<your github.com email>"
+    ```
+
+7.  (Optional) Configure git to use your favorite editor. For example, to use vim:
 
     ```
     git config --global core.editor vim
     ```
 
-4.  Close your terminals and open a new one for some setup to be effective.
+8.  Close your terminals and open a new one for some setup to be effective.
 
 ## Part 3: Using the Software
-
-<!-- ### VSCode:
-
-Visual Studio Code is the development environment we recommend using. It has many builtin features that are useful for big projects development. The setup script your ran before should have installed the newest version for you!
-
-You won't be able to access VS Code through the GUI or by typing "code" into the command line. This is due to some features not being available on AFS.
-
-You can alternatively run it from the terminal using:
-
-      run-vscode-6106
-
-This will launch vscode and you should be able to pass parameters to it, like you would normally use `code`. -->
 
 ### Clang
 
@@ -155,29 +189,19 @@ Clang is the C compiler that we will use in this class. We provide a custom vers
 clang-6106
 ```
 
-### awsrun
+### telerun
 
-awsrun is the program you will use to submit jobs to the class AWS instances for reliable performance benchmarking. You will learn more about his during your first homework. You can use it by running:
+telerun is the program you will use to submit jobs to the class instances for reliable performance benchmarking. You will learn more about his during your first homework. You can use it by running:
 
 ```
-awsrun [binary]
+telerun [binary]
 ```
 
 ## Part 4: Test
 
-<!-- 1. **Open the `student_software` folder in VS code**
-    It will prompt you whether to install the recommended extensions. Install them.
-    If you miss the prompt:
-    1. Press Ctrl-Shift-P
-    2. Type `Extensions: Install Extensions` and select that option
-    3. Look to the Recommended tab of the Extensions menu
-    4. Click Install on each of the recommended extensions.
-
-**If the extensions fail to install, restart VS Code and try installing them again.** -->
-
 ### Build the student_software test program
 
-1. Start a new terminal in your VM or inside the `student_software` VS Code window, click on Terminal, then Select New Terminal
+1. Start a new terminal in your VM or through a remote VSCode window.
 
 2. Inside the Terminal, run (You can ignore warnings/messages printed by the LLVM Gold plugin during compilation):
 
@@ -185,7 +209,7 @@ awsrun [binary]
    cd ~/student_software
    make
    ./test_program
-   awsrun ./test_program
+   telerun ./test_program
    ```
 
    If everything worked correctly, you should see the following output.
@@ -203,7 +227,7 @@ awsrun [binary]
    Welcome to 6.106!
 
 
-   user@vm:~/student_software$ awsrun ./test_program
+   user@vm:~/student_software$ telerun ./test_program
 
    Submitting Job: ./test_program
    Waiting for job to finish...

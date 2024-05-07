@@ -4,4 +4,4 @@ echo "Starting 6.106 Setup"
 ./scripts/install_opencilk.sh
 ./scripts/install_simde.sh
 ./scripts/install_telerun.sh
-./scripts/authorize_telerun.sh
+./scripts/install_update_scripts.sh

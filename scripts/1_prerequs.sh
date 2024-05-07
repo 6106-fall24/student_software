@@ -29,9 +29,11 @@ else
       gnome-settings-daemon \
       metacity \
       nautilus \
+      network-manager \
       gnome-terminal \
       gdb \
-      openssh-server
+      openssh-server \
+      llvm
    
    add-apt-repository ppa:ubuntu-toolchain-r/test
    apt upgrade -y libstdc++6
