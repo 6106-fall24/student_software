@@ -1,0 +1,45 @@
+{
+    "variables": {
+      "aws_access_key": "",
+      "aws_secret_key": "",
+      "owner": ""
+    },
+    "builders": [
+      {
+        "type": "amazon-ebs",
+        "access_key": "{{user `aws_access_key`}}",
+        "secret_key": "{{user `aws_secret_key`}}",
+        "region": "us-east-1",
+        "source_ami_filter": {
+          "filters": {
+            "virtualization-type": "hvm",
+            "name": "ubuntu/images/*ubuntu-bionic-18.04-amd64-server-*",
+            "root-device-type": "ebs"
+          },
+          "owners": ["099720109477"],
+          "most_recent": true
+        },
+        "instance_type": "t2.small",
+        "ssh_username": "ubuntu",
+        "ami_name": "6172-fall20-student-{{timestamp}}",
+        "ami_groups": "all"
+      }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "script": "../../scripts/1_prerequs.sh",
+            "execute_command": "/usr/bin/cloud-init status --wait && '{{ .Path }}'",
+            "environment_vars": [
+              "DEBIAN_FRONTEND=noninteractive"
+            ]
+        },
+        {
+            "type": "shell",
+            "script": "../../scripts/2_6172.sh",
+            "environment_vars": [
+              "DEBIAN_FRONTEND=noninteractive"
+            ]
+        }
+    ]
+}
