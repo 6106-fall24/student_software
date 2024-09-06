@@ -157,6 +157,7 @@ def main():
     )
     parser.add_argument("--override-pending", action="store_true", help="Allow overriding pending jobs")
     parser.add_argument("--utils", action="store_true", help="Use utility queue instead of main queue, for testing purposes instead of benchmarking performance. Timeout will be longer.")
+    parser.add_argument("--bypass-last-job", action="store_true", help="Bypass checking for your last job.")
     args, script_args = parser.parse_known_args()
     if len(script_args) == 0:
         print("Please provide a script to run.")
@@ -188,7 +189,8 @@ def main():
     is_util = args.utils
     ssl_ctx = ssl.create_default_context(cadata=server_cert)
 
-    last_complete_job = get_last_complete_job(username, token, ssl_ctx)
+    if not args.bypass_last_job:
+        last_complete_job = get_last_complete_job(username, token, ssl_ctx)
 
     job_id = submit_job(username, token, script_args, ssl_ctx, override_pending=args.override_pending, is_util=is_util)
     if job_id is None:
