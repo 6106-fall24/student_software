@@ -70,10 +70,15 @@ def process_response(response, script_args=None, job_id=None):
         with open("perf.data", "wb") as f:
             f.write(base64.b64decode(result["perf_data"]))
         for idx, file in enumerate(script_args["files"]):
+            if file[:2] == './': 
+                file = file[2:]
             with open(file, 'rb') as f:
                 file_content = f.read()
                 # write this to a hidden directory
                 assert job_id is not None and script_args is not None
+                # if job-{job_id} doesn't exist, create it
+                if not os.path.exists(os.path.join(hidden_perf_directory, f"job-{job_id}")):
+                    os.makedirs(os.path.join(hidden_perf_directory, f"job-{job_id}"))
                 with open(os.path.join(hidden_perf_directory, f"job-{job_id}/{file}"), "wb") as f2:
                     f2.write(file_content)
                     
