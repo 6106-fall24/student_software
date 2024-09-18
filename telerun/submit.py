@@ -51,7 +51,7 @@ NZNzB8+DKbH4WZ3PQ2bHCx3BMw4LSB9sihcGUe9se+Lob+SnKeMNUYFlry4bQg==
 server_ip_port = "54.166.14.117:4443"
 hidden_perf_directory = "/tmp/6106-student-jobs"
 
-poll_interval = 0.25 # seconds
+poll_interval = 1 # seconds
 
 def process_response(response, script_args=None, job_id=None):
     result = json.loads(response["result"])["result_json"]
