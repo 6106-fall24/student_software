@@ -76,6 +76,8 @@ def process_response(response, script_args=None, job_id=None):
                 file_content = f.read()
                 # write this to a hidden directory
                 assert job_id is not None and script_args is not None
+                if not os.path.exists(os.path.join(hidden_perf_directory, f"job-{job_id}")):
+                    os.makedirs(os.path.join(hidden_perf_directory, f"job-{job_id}"))
                 with open(os.path.join(hidden_perf_directory, f"job-{job_id}/{file}"), "wb") as f2:
                     f2.write(file_content)
                     
