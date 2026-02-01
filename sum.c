@@ -1,4 +1,4 @@
-#include <x86/avx2.h>
+#include <immintrin.h>
 #include "sum.h"
 
 int sum(int a, int b) { return a + b; }

@@ -10,7 +10,7 @@ DEFINES += -DSIMDE_ENABLE_NATIVE_ALIASES
 
 # What we're building with
 CC = clang-6106
-CFLAGS = -std=gnu11 -Wall -Wno-psabi -fopencilk $(DEFINES)
+CFLAGS = -std=gnu11 -Wall -Wno-psabi -fopencilk -mavx2 $(DEFINES)
 LDFLAGS = -static -pthread -fuse-ld=lld -lrt -lm -fopencilk -flto 
 
 include ./cilkutils.mk
