@@ -162,8 +162,8 @@ Within your Linux machine,
     ```
     authorize-telerun
     ```
+    You can find your telerun credentials in Canvas in a grade comment under the Assignment "Telerun Credentials".
 
-    Enter your kerb as the username. To obtain your token, visit this [site](https://carlguo.scripts.mit.edu:444/serve_tokens.pl) and authenticate with your MIT certificate. If you don't have an MIT certificate or have not renewed your certificate since last school year, please generate one using [CertAid](https://ist.mit.edu/mit-apps/certaid) and reboot your computer. If the browser prompts you that the site is unsafe, just bypass the safety warning. 
 5.  Configure your git identity:
 
     ```
